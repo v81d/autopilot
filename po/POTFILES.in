@@ -1,0 +1,6 @@
+# List of source files containing translatable strings.
+# Please keep this file sorted alphabetically.
+data/io.github.v81d.Autopilot.desktop.in
+data/io.github.v81d.Autopilot.metainfo.xml.in
+data/io.github.v81d.Autopilot.gschema.xml
+src/window.blp

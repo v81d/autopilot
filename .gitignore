@@ -1,0 +1,15 @@
+# Blueprint compiler resources
+subprojects/blueprint-compiler
+
+# Compiled files and executables
+debug/
+target/
+
+# Information about dependencies
+Cargo.lock
+
+# rustfmt backup files
+**/*.rs.bk
+
+# Auto-built configuration file
+src/config.rs

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Autopilot
+Exec=Autopilot
+Icon=io.github.v81d.Autopilot
+Terminal=false
+Type=Application
+Categories=Utility;
+Keywords=GTK;
+StartupNotify=true
+DBusActivatable=true

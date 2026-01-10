@@ -1,0 +1,92 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $AutopilotWindow: Adw.ApplicationWindow {
+  title: _("Autopilot");
+  default-width: 1000;
+  default-height: 700;
+
+  content: Adw.ToastOverlay content_toast_overlay {
+    child: Adw.OverlaySplitView split_view {
+      sidebar: Adw.NavigationPage {
+        title: _("Profiles");
+        tag: "sidebar";
+
+        child: Adw.ToolbarView {
+          [top]
+          Adw.HeaderBar {}
+
+          content: Gtk.Box {
+            hexpand: true;
+            vexpand: true;
+            orientation: vertical;
+
+            Gtk.ListBox profile_list_box {
+              hexpand: true;
+
+              css-classes: [
+                "navigation-sidebar",
+              ];
+            }
+
+            Gtk.Box {
+              hexpand: true;
+              vexpand: true;
+              halign: center;
+              valign: center;
+
+              Adw.Spinner profile_list_spinner {
+                width-request: 64;
+                height-request: 64;
+                visible: false;
+              }
+            }
+          };
+        };
+      };
+
+      content: Adw.NavigationPage {
+        title: "Autopilot";
+        tag: "content";
+
+        child: Adw.ToolbarView {
+          [top]
+          Adw.HeaderBar {
+            [end]
+            MenuButton {
+              primary: true;
+              icon-name: "open-menu-symbolic";
+              tooltip-text: _("Main Menu");
+              menu-model: primary_menu;
+            }
+
+            [end]
+            Gtk.Button new_profile_button {
+              icon-name: "list-add-symbolic";
+              tooltip-text: _("New Profile");
+            }
+          }
+        };
+      };
+    };
+  };
+}
+
+menu primary_menu {
+  section {
+    item {
+      label: _("_Preferences");
+      action: "app.preferences";
+    }
+
+    item {
+      label: _("_Keyboard Shortcuts");
+      action: "app.shortcuts";
+    }
+
+    item {
+      label: _("_About Autopilot");
+      action: "app.about";
+    }
+  }
+}
