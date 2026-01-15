@@ -5,9 +5,18 @@ template $AutopilotWindow: Adw.ApplicationWindow {
   title: _("Autopilot");
   default-width: 1000;
   default-height: 700;
+  width-request: 550;
 
-  content: Adw.ToastOverlay content_toast_overlay {
-    child: Adw.OverlaySplitView split_view {
+  Adw.Breakpoint {
+    condition("max-width: 730sp")
+    setters {
+      main_split_view.collapsed: true;
+      toggle_sidebar_button.active: false;
+    }
+  }
+
+  content: Adw.ToastOverlay main_toast_overlay {
+    child: Adw.OverlaySplitView main_split_view {
       sidebar: Adw.NavigationPage {
         title: _("Profiles");
         tag: "sidebar";
@@ -16,30 +25,34 @@ template $AutopilotWindow: Adw.ApplicationWindow {
           [top]
           Adw.HeaderBar {}
 
-          content: Gtk.Box {
+          content: Gtk.Overlay {
             hexpand: true;
             vexpand: true;
-            orientation: vertical;
 
-            Gtk.ListBox profile_list_box {
-              hexpand: true;
-
-              css-classes: [
-                "navigation-sidebar",
-              ];
+            [overlay]
+            Adw.Spinner sidebar_spinner {
+              width-request: 64;
+              height-request: 64;
+              visible: false;
             }
 
-            Gtk.Box {
-              hexpand: true;
-              vexpand: true;
-              halign: center;
-              valign: center;
+            [overlay]
+            Adw.StatusPage sidebar_empty_status {
+              title: _("No Profiles Found");
+              description: _("Create a profile to continue");
+              icon-name: "input-mouse-symbolic";
+              visible: true;
+            }
 
-              Adw.Spinner profile_list_spinner {
-                width-request: 64;
-                height-request: 64;
-                visible: false;
-              }
+            Gtk.ScrolledWindow sidebar_scrolled_window {
+              vexpand: true;
+
+              child: Gtk.ListBox profile_list_box {
+                hexpand: true;
+                css-classes: [
+                  "navigation-sidebar",
+                ];
+              };
             }
           };
         };
@@ -52,8 +65,15 @@ template $AutopilotWindow: Adw.ApplicationWindow {
         child: Adw.ToolbarView {
           [top]
           Adw.HeaderBar {
+            [start]
+            Gtk.ToggleButton toggle_sidebar_button {
+              icon-name: "sidebar-show-symbolic";
+              tooltip-text: "Toggle Sidebar";
+              active: true;
+            }
+
             [end]
-            MenuButton {
+            Gtk.MenuButton {
               primary: true;
               icon-name: "open-menu-symbolic";
               tooltip-text: _("Main Menu");
@@ -66,6 +86,260 @@ template $AutopilotWindow: Adw.ApplicationWindow {
               tooltip-text: _("New Profile");
             }
           }
+
+          content: Gtk.Overlay {
+            hexpand: true;
+            vexpand: true;
+
+            [overlay]
+            Adw.Spinner content_spinner {
+              width-request: 64;
+              height-request: 64;
+              visible: false;
+            }
+
+            [overlay]
+            Adw.StatusPage content_empty_status {
+              title: _("Welcome to Autopilot");
+              description: _("Automate your clicks and free your focus");
+              icon-name: "io.github.v81d.Autopilot-symbolic";
+              visible: true;
+
+              child: Gtk.Button get_started_button {
+                halign: center;
+                label: _("Get Started");
+                css-classes: [
+                  "suggested-action",
+                  "pill",
+                ];
+              };
+            }
+
+            Gtk.ScrolledWindow content_scrolled_window {
+              vexpand: true;
+              visible: false;
+
+              child: Gtk.Box {
+                hexpand: true;
+                vexpand: true;
+                orientation: vertical;
+                margin-start: 24;
+                margin-end: 24;
+                margin-top: 24;
+                margin-bottom: 24;
+                spacing: 24;
+
+                Adw.PreferencesGroup {
+                  title: _("Profile Information");
+
+                  Adw.EntryRow {
+                    title: _("Name");
+                    text: "New Profile";
+                  }
+
+                  Adw.EntryRow {
+                    title: _("Description");
+                    text: "A brief description of the profile.";
+                  }
+                }
+
+                Adw.PreferencesGroup {
+                  title: _("Interval Options");
+
+                  Adw.ActionRow {
+                    child: Gtk.Box {
+                      homogeneous: true;
+                      margin-start: 12;
+                      margin-end: 12;
+                      margin-top: 12;
+                      margin-bottom: 12;
+                      spacing: 12;
+
+                      Gtk.Box {
+                        orientation: vertical;
+                        spacing: 12;
+
+                        Gtk.Label {
+                          label: _("Hours");
+                        }
+
+                        Gtk.SpinButton {
+                          adjustment: Gtk.Adjustment {
+                            lower: 0;
+                            upper: 23;
+                            step-increment: 1;
+                          };
+                        }
+                      }
+
+                      Gtk.Box {
+                        orientation: vertical;
+                        spacing: 12;
+
+                        Gtk.Label {
+                          label: _("Minutes");
+                        }
+
+                        Gtk.SpinButton {
+                          adjustment: Gtk.Adjustment {
+                            lower: 0;
+                            upper: 59;
+                            step-increment: 1;
+                          };
+                        }
+                      }
+
+                      Gtk.Box {
+                        orientation: vertical;
+                        spacing: 12;
+
+                        Gtk.Label {
+                          label: _("Seconds");
+                        }
+
+                        Gtk.SpinButton {
+                          adjustment: Gtk.Adjustment {
+                            lower: 0;
+                            upper: 59;
+                            step-increment: 1;
+                          };
+                        }
+                      }
+
+                      Gtk.Box {
+                        orientation: vertical;
+                        spacing: 12;
+
+                        Gtk.Label {
+                          label: _("Milliseconds");
+                        }
+
+                        Gtk.SpinButton {
+                          adjustment: Gtk.Adjustment {
+                            lower: 0;
+                            upper: 999;
+                            value: 100;
+                            step-increment: 1;
+                          };
+                        }
+                      }
+                    };
+                  }
+                }
+
+                Adw.PreferencesGroup {
+                  title: _("Click Settings");
+
+                  Adw.ComboRow {
+                    title: _("Mouse Button");
+                    subtitle: _("The mouse button used for the simulated click.");
+
+                    model: Gtk.StringList {
+                      strings [
+                        _("Left"),
+                        _("Middle"),
+                        _("Right"),
+                      ]
+                    };
+                  }
+
+                  Adw.ComboRow {
+                    title: _("Click Type");
+                    subtitle: _("The type of click to simulate.");
+
+                    model: Gtk.StringList {
+                      strings [
+                        _("Single"),
+                        _("Double"),
+                      ]
+                    };
+                  }
+                }
+
+                Adw.PreferencesGroup {
+                  title: _("Click Location");
+
+                  Adw.SwitchRow {
+                    title: _("Use Cursor Location");
+                    subtitle: _("Simulate the clicks at the position the cursor is already at.");
+                  }
+
+                  Adw.ActionRow {
+                    child: Gtk.Box {
+                      homogeneous: true;
+                      margin-start: 12;
+                      margin-end: 12;
+                      margin-top: 12;
+                      margin-bottom: 12;
+                      spacing: 12;
+
+                      Gtk.Box {
+                        orientation: vertical;
+                        spacing: 12;
+
+                        Gtk.Label {
+                          label: _("X-Position");
+                        }
+
+                        Gtk.SpinButton {
+                          adjustment: Gtk.Adjustment {
+                            lower: 0;
+                            upper: 9999999;
+                            step-increment: 1;
+                          };
+                        }
+                      }
+
+                      Gtk.Box {
+                        orientation: vertical;
+                        spacing: 12;
+
+                        Gtk.Label {
+                          label: _("Y-Position");
+                        }
+
+                        Gtk.SpinButton {
+                          adjustment: Gtk.Adjustment {
+                            lower: 0;
+                            upper: 9999999;
+                            step-increment: 1;
+                          };
+                        }
+                      }
+                    };
+                  }
+                }
+
+                Gtk.Box {
+                  homogeneous: true;
+                  spacing: 12;
+
+                  Gtk.Button {
+                    label: _("Start");
+                    css-classes: [
+                      "suggested-action",
+                      "pill",
+                    ];
+                  }
+
+                  Gtk.Button {
+                    label: _("Stop");
+                    css-classes: [
+                      "pill",
+                    ];
+                  }
+                }
+
+                Gtk.Button {
+                  label: _("Delete Profile");
+                  css-classes: [
+                    "destructive-action",
+                    "pill",
+                  ];
+                }
+              }; 
+            }
+          };
         };
       };
     };

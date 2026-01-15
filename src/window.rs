@@ -30,9 +30,15 @@ mod imp {
     pub struct AutopilotWindow {
         // Template widgets
         #[template_child]
+        pub main_split_view: TemplateChild<adw::OverlaySplitView>,
+        #[template_child]
+        pub toggle_sidebar_button: TemplateChild<gtk::ToggleButton>,
+        #[template_child]
         pub profile_list_box: TemplateChild<gtk::ListBox>,
         #[template_child]
         pub new_profile_button: TemplateChild<gtk::Button>,
+        #[template_child]
+        pub get_started_button: TemplateChild<gtk::Button>,
     }
 
     #[glib::object_subclass]
@@ -78,6 +84,26 @@ impl AutopilotWindow {
             self,
             move |_| this.add_new_profile()
         ));
+
+        // Attach callback for Get Started button
+        imp.get_started_button.connect_clicked(glib::clone!(
+            #[weak(rename_to = this)]
+            self,
+            move |_| this.add_new_profile()
+        ));
+
+        // Attach callback for Toggle Sidebar button
+        imp.toggle_sidebar_button.connect_toggled(glib::clone!(
+            #[weak(rename_to = this)]
+            self,
+            move |_| this.toggle_sidebar()
+        ));
+    }
+
+    pub fn toggle_sidebar(&self) {
+        let imp = self.imp();
+        let sidebar_toggled = imp.toggle_sidebar_button.is_active();
+        imp.main_split_view.set_show_sidebar(sidebar_toggled);
     }
 
     pub fn append_sidebar_profile(&self, name: &str, description: &str) {
@@ -92,12 +118,11 @@ impl AutopilotWindow {
             .build();
 
         row.set_child(Some(&action_row));
-
         imp.profile_list_box.append(&row);
     }
 
     pub fn add_new_profile(&self) {
         // TODO: complete this callback
-        self.append_sidebar_profile("New Profile", "This is a new Autopilot macro.")
+        self.append_sidebar_profile("New Profile", "A brief description of the profile.")
     }
 }
