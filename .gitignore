@@ -13,3 +13,6 @@ Cargo.lock
 
 # Auto-built configuration file
 src/config.rs
+
+# Foundry build folder
+.foundry/
